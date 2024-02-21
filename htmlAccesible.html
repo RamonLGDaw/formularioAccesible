@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario Accesible</title>
+    <style>
+        .error {
+            border: 1px solid red;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .mensaje-error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Formulario de Contacto</h2>
+    <form id="contactForm" action="#" method="post" enctype="multipart/form-data">
+        <fieldset>
+            <legend>Información de contacto</legend>
+            <div class="form-group">
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" placeholder="Ingrese su nombre completo" required>
+                <span>(obligatorio)</span>
+                <!-- Este span y los siguientes sirven para mostrar errores en caso de ser necesario -->
+                <span id="nombre-error" class="mensaje-error"></span>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="text" id="email" name="email" placeholder="example@example.com" required>
+                <span>(obligatorio)</span>
+                <span id="email-error" class="mensaje-error"></span>
+            </div>
+            <div class="form-group">
+                <label for="mensaje">Mensaje:</label>
+                <textarea id="mensaje" name="mensaje" placeholder="Escriba su mensaje aquí" rows="4"
+                    required></textarea>
+                <span>(obligatorio)</span>
+                <span id="mensaje-error" class="mensaje-error"></span>
+            </div>
+            <fieldset class="form-group">
+                <legend>Opciones:</legend>
+                <input type="radio" id="opcion1" name="opciones" value="opcion1" required>
+                <label for="opcion1">Opción 1</label><br>
+                <input type="radio" id="opcion2" name="opciones" value="opcion2">
+                <label for="opcion2">Opción 2</label><br>
+                <input type="radio" id="opcion3" name="opciones" value="opcion3">
+                <label for="opcion3">Opción 3</label><br>
+                <span id="opciones-error" class="mensaje-error"></span>
+            </fieldset>
+            <div class="form-group">
+                <input type="checkbox" id="suscribirse" name="suscribirse">
+                <label for="suscribirse">Suscribirse a nuestro boletín</label><br>
+            </div>
+            <div class="form-group">
+                <label for="departamento">Departamento:</label>
+                <select id="departamento" name="departamento" required>
+                    <option value="">Seleccione un departamento</option>
+                    <optgroup label="Ventas">
+                        <option value="ventas_1">Ventas 1</option>
+                        <option value="ventas_2">Ventas 2</option>
+                    </optgroup>
+                    <optgroup label="Soporte">
+                        <option value="soporte_1">Soporte 1</option>
+                        <option value="soporte_2">Soporte 2</option>
+                    </optgroup>
+                    <optgroup label="Administración">
+                        <option value="admin_1">Administración 1</option>
+                        <option value="admin_2">Administración 2</option>
+                    </optgroup>
+                </select>
+                <span>(obligatorio)</span>
+                <span id="departamento-error" class="mensaje-error"></span>
+            </div>
+            <div class="form-group">
+                <label for="archivo">Adjuntar archivo:</label>
+                <input type="file" id="archivo" name="archivo" accept=".pdf,.doc,.docx,.jpg,.png" required>
+                <span>(formatos aceptados: PDF, DOC, DOCX, JPG, PNG)</span>
+                <span id="archivo-error" class="mensaje-error"></span>
+            </div>
+        </fieldset>
+        <div>
+            <input type="submit" value="Enviar">
+        </div>
+    </form>
+
+    <script>
+        function validarNombre(nombre) {
+            // Validación de nombre: solo letras, no números ni caracteres especiales.
+            return /^[A-Za-záéíóúÁÉÍÓÚñÑ\s]+$/.test(nombre);
+        }
+
+        function validarEmail(email) {
+            // Validación simple de email
+            return /\S+@\S+\.\S+/.test(email);
+        }
+
+        const form = document.getElementById('contactForm');
+
+        form.addEventListener('submit', (event) => {
+            const nombre = document.getElementById('nombre');
+            const email = document.getElementById('email');
+            const mensaje = document.getElementById('mensaje');
+            const opciones = document.getElementsByName('opciones');
+            const departamento = document.getElementById('departamento');
+            const archivo = document.getElementById('archivo');
+            let valid = true;
+
+            // Limpiar mensajes de error y estilos de error
+            const errorMessages = document.querySelectorAll('.mensaje-error');
+            errorMessages.forEach(mensaje => mensaje.textContent = '');
+
+            // Array con todos los tipos de inputs
+            const inputs = [nombre, email, mensaje, departamento, archivo];
+
+            //Muestra mensaje de error para campos vacios
+            inputs.forEach(input => {
+                if (input.value.trim() === '') {
+                    input.classList.add('error');
+                    const errorMessage = input.id + "-error";
+                    document.getElementById(errorMessage).textContent = 'Por favor, complete este campo';
+                    valid = false;
+                } else {
+                    input.classList.remove('error');
+                }
+            });
+
+            if (!validarNombre(nombre.value)) {
+                nombre.classList.add('error');
+                document.getElementById('nombre-error').textContent = 'El nombre debe contener solo letras';
+                valid = false;
+            }
+
+            if (!validarEmail(email.value)) {
+                email.classList.add('error');
+                document.getElementById('email-error').textContent = 'El campo mail debe contener un formato del tipo: "micorreo@ejemplo.com"';
+                valid = false;
+            }
+
+            let opcionSeleccionada = false;
+            for (let i = 0; i < opciones.length; i++) {
+                if (opciones[i].checked) {
+                    opcionSeleccionada = true;
+                    break;
+                }
+            }
+            if (!opcionSeleccionada) {
+                document.getElementById('opciones-error').textContent = 'Por favor, seleccione una opción';
+                valid = false;
+            }
+
+            if (departamento.value === '') {
+                departamento.classList.add('error');
+                document.getElementById('departamento-error').textContent = 'Por favor, seleccione un departamento';
+                valid = false;
+            }
+
+            if (archivo.value.trim() === '') {
+                archivo.classList.add('error');
+                document.getElementById('archivo-error').textContent = 'Por favor, adjunte un archivo';
+                valid = false;
+            }
+
+            if (!valid) {
+                event.preventDefault();
+            }
+        });
+
+
+    </script>
+</body>
+
+</html>
